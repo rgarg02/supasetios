@@ -1,0 +1,33 @@
+{
+  "originHash" : "1e6dd3d7806231b67d4423a03ed1e3faef43f157d998bc5e038ff4ff3dc4d3f4",
+  "pins" : [
+    {
+      "identity" : "grdb.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/groue/GRDB.swift",
+      "state" : {
+        "branch" : "master",
+        "revision" : "a5a1be26b4513dc7ec360eb56bc08a345bac6649"
+      }
+    },
+    {
+      "identity" : "grdbquery?tab=readme-ov-file",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/groue/GRDBQuery?tab=readme-ov-file",
+      "state" : {
+        "revision" : "540dc48e86af2972b4f1815616aa1ed8ac97845a",
+        "version" : "0.11.0"
+      }
+    },
+    {
+      "identity" : "swiftcsv",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftcsv/SwiftCSV",
+      "state" : {
+        "revision" : "6ab5d0fe9b6ef3c79d717eefa70862df389e74d9",
+        "version" : "0.10.0"
+      }
+    }
+  ],
+  "version" : 3
+}
