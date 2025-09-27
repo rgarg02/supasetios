@@ -15,10 +15,18 @@ struct WorkoutExercisesView: View {
     @Environment(\.appDatabase) private var appDatabase
     @Query<WorkoutExercisesRequest>
     private var exercises: [WorkoutExerciseWithExercise]
+    @Query<ActivePrimaryMuscleRequest>
+    private var activePrimaryMuscles: Set<MuscleGroup>
+    @Query<ActiveSecondaryMusclesRequest>
+    private var activeSecondaryMuscles: Set<MuscleGroup>
     init(workoutID: Int64) {
         _exercises = Query(WorkoutExercisesRequest(workoutId: workoutID))
+        _activePrimaryMuscles = Query(ActivePrimaryMuscleRequest(workoutId: workoutID))
+        _activeSecondaryMuscles = Query(ActiveSecondaryMusclesRequest(workoutId: workoutID))
     }
     let padding: CGFloat = 10
+    @State private var showMuscleDistribution = false
+    @State private var selectedMuscle: MuscleGroup?
     var body: some View {
         ForEach(exercises, id: \.workoutExercise.id) { exercise in
             let workoutExercise = exercise.workoutExercise
@@ -45,6 +53,18 @@ struct WorkoutExercisesView: View {
             .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
         }
         .animation(.easeInOut, value: exercises)
+        .toolbar {
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Show") {
+                    showMuscleDistribution = true
+                }
+            }
+        }
+        .sheet(isPresented: $showMuscleDistribution) {
+            MuscleDistributionView(activePrimaryMuscles: activePrimaryMuscles, activeSecondaryMuscles: activeSecondaryMuscles, selectedMuscle: $selectedMuscle)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.medium])
+        }
     }
     private func deleteExercise(_ exercise: WorkoutExerciseRecord) {
         Task{

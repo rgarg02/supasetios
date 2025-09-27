@@ -10,6 +10,7 @@ import GRDBQuery
 import SwiftfulRouting
 @main
 struct SupaSetApp: App {
+    @State private var selectedMusce: MuscleGroup?
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -26,3 +26,49 @@ struct WorkoutExercisesRequest: ValueObservationQueryable {
         return output
     }
 }
+struct ActivePrimaryMuscleRequest: ValueObservationQueryable {
+    /// How players are sorted.
+    var workoutId: Int64
+
+    static var defaultValue: Set<MuscleGroup> { [] }
+
+    func fetch(_ db: Database) throws -> Set<MuscleGroup> {
+        let exerciseIds = try WorkoutExerciseRecord
+            .filter({$0.workoutId == workoutId})
+            .fetchAll(db)
+            .map({$0.exerciseID})
+        var primaryMuscles : Set<MuscleGroup> = []
+        for exerciseId in exerciseIds {
+            let activeMuscles = try ExercisePrimaryMuscle
+                .filter({$0.exerciseId == exerciseId})
+                .fetchAll(db)
+            activeMuscles.forEach { primaryMuscle in
+                primaryMuscles.insert(primaryMuscle.muscleGroup)
+            }
+        }
+        return primaryMuscles
+    }
+}
+struct ActiveSecondaryMusclesRequest: ValueObservationQueryable {
+    /// How players are sorted.
+    var workoutId: Int64
+
+    static var defaultValue: Set<MuscleGroup> { [] }
+
+    func fetch(_ db: Database) throws -> Set<MuscleGroup> {
+        let exerciseIds = try WorkoutExerciseRecord
+            .filter({$0.workoutId == workoutId})
+            .fetchAll(db)
+            .map({$0.exerciseID})
+        var secondaryMuscles : Set<MuscleGroup> = []
+        for exerciseId in exerciseIds {
+            let activeMuscles = try ExerciseSecondaryMuscle
+                .filter({$0.exerciseId == exerciseId})
+                .fetchAll(db)
+            activeMuscles.forEach { secondaryMuscle in
+                secondaryMuscles.insert(secondaryMuscle.muscleGroup)
+            }
+        }
+        return secondaryMuscles
+    }
+}

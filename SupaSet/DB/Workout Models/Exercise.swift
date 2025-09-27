@@ -112,6 +112,7 @@ enum MuscleGroup: String, Codable, CaseIterable, DatabaseValueConvertible {
     case shoulders = "shoulders"
     case traps = "traps"
     case triceps = "triceps"
+    case others = "others"
 }
 
 // MARK: - Exercise Primary Muscles Junction Table

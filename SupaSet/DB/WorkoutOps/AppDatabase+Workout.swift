@@ -17,6 +17,42 @@ extension AppDatabase {
                 .fetchOne(db)
         }
     }
+    func getActivePrimaryMuscles(workoutId: Int64?) async throws -> Set<MuscleGroup> {
+        return try await reader.read { db in
+            let exerciseIds = try WorkoutExerciseRecord
+                .filter({$0.workoutId == workoutId})
+                .fetchAll(db)
+                .map({$0.exerciseID})
+            var primaryMuscles : Set<MuscleGroup> = []
+            for exerciseId in exerciseIds {
+                let activeMuscles = try ExercisePrimaryMuscle
+                    .filter({$0.exerciseId == exerciseId})
+                    .fetchAll(db)
+                activeMuscles.forEach { primaryMuscle in
+                    primaryMuscles.insert(primaryMuscle.muscleGroup)
+                }
+            }
+            return primaryMuscles
+        }
+    }
+    func getActiveSecondaryMuscles(workoutId: Int64?) async throws -> Set<MuscleGroup> {
+        return try await reader.read { db in
+            let exerciseIds = try WorkoutExerciseRecord
+                .filter({$0.workoutId == workoutId})
+                .fetchAll(db)
+                .map({$0.exerciseID})
+            var secondaryMuscles : Set<MuscleGroup> = []
+            for exerciseId in exerciseIds {
+                let activeMuscles = try ExerciseSecondaryMuscle
+                    .filter({$0.exerciseId == exerciseId})
+                    .fetchAll(db)
+                activeMuscles.forEach { secondaryMuscle in
+                    secondaryMuscles.insert(secondaryMuscle.muscleGroup)
+                }
+            }
+            return secondaryMuscles
+        }
+    }
     func startWorkout(name: String, notes: String) async throws {
         return try await dbWriter.write { db in
             let workout = WorkoutRecord(name: name, notes: notes)

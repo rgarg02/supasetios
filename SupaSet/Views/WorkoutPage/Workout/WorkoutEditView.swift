@@ -51,32 +51,39 @@ struct WorkoutEditView: View {
                     .opacity(opacity)
                     .blur(radius: blur)
             }
+            ToolbarItem(placement: .bottomBar) {
+                Button {
+                    
+                } label: {
+                    Label("Cancel Workout", systemImage: "trash")
+                }
+                .modify({ view in
+                    if #available(iOS 26, *){
+                        view
+                            .glassEffect(.regular.interactive().tint(.theme.primary.opacity(0.3)), in: .capsule)
+                    }
+                })
+                .buttonStyle(.borderless)
+            }
+            ToolbarItem(placement: .bottomBar) {
+                    
+                    Button{
+                        
+                    } label: {
+                        Text("Add Exercises")
+                    }
+                    .modify({ view in
+                        if #available(iOS 26, *){
+                            view
+                                .glassEffect(.regular.interactive().tint(.theme.primary.opacity(0.3)), in: .capsule)
+                        }
+                    })
+                    .buttonStyle(.borderless)
+            }
         }
         .safeAreaInset(edge: .bottom, content: {
             if showKeyboardButtons {
-                HStack {
-                    Spacer()
-                    if toolbarVC.fieldType != nil {
-                        Button {
-                            toolbarVC.moveToNextField()
-                        } label: {
-                            Image(systemName: "arrowshape.right")
-                        }
-                        .modify {
-                            if #available(iOS 26, *) {
-                                $0
-                                    .buttonStyle(.glass)
-                                    .clipShape(.rect(corners: .concentric(), isUniform: true))
-                            }
-                        }
-                        
-                    }
-                }
-                .padding(3)
-                .containerShape(.rect(cornerRadius: 12))
-                .background(.thinMaterial, in: .rect(cornerRadius: 12))
-                .padding(.horizontal)
-                .transition(.blurReplace)
+                ToolbarControls(toolbarVC: toolbarVC)
             }
         })
         .animation(.bouncy(duration: 0.25), value: showKeyboardButtons)
