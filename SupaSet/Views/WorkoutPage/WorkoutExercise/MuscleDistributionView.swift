@@ -11,6 +11,11 @@ struct MuscleDistributionView: View {
     let activePrimaryMuscles: Set<MuscleGroup>
     let activeSecondaryMuscles: Set<MuscleGroup>
     @Binding var selectedMuscle: MuscleGroup?
+    init(activePrimaryMuscles: Set<MuscleGroup>, activeSecondaryMuscles: Set<MuscleGroup>, selectedMuscle: Binding<MuscleGroup?> = .constant(nil)) {
+        self.activePrimaryMuscles = activePrimaryMuscles
+        self.activeSecondaryMuscles = activeSecondaryMuscles
+        self._selectedMuscle = selectedMuscle
+    }
     var body: some View {
         VStack(spacing: 0) {
             Text("Muscle Distribution")

@@ -10,9 +10,11 @@ struct ProfilePageView: View {
     @State private var showSettings = false
     @Environment(\.appDatabase) private var appDatabase
     var body: some View {
-        VStack {
+        ScrollView {
             
         }
+        .frame(maxHeight: .infinity)
+        .navigationTitle("Profile")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Settings", systemImage: "gear") {

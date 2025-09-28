@@ -10,34 +10,10 @@ import GRDBQuery
 import GRDB
 struct WorkoutPageView: View {
     @Environment(\.appDatabase) private var appDatabase
-    @State private var isEditingWorkout = false
-    @Query(OngoingWorkoutQuery())
-    private var ongoingWorkout: WorkoutRecord?
     var body: some View {
         ScrollView{
             VStack {
                 TemplateCarasouleView()
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    Task {
-                        do {
-                            if ongoingWorkout == nil {
-                                try await appDatabase.startWorkout(name: "New Workout", notes: "")
-                                isEditingWorkout = true
-                            } else {
-                                isEditingWorkout = true
-                            }
-                        } catch {
-                            // Handle potential errors during workout creation/action
-                            print("Error during workout action: \(error.localizedDescription)")
-                        }
-                    }
-                } label: {
-                    Label(ongoingWorkout == nil ? "Start Workout" : "Edit Workout", systemImage: ongoingWorkout == nil ? "plus" : "pencil")
-                }
             }
         }
     }

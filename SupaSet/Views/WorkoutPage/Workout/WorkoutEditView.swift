@@ -5,113 +5,163 @@
 //  Created by Rishi Garg on 7/7/25.
 //
 
-
 import SwiftUI
 import GRDB
-
+import GRDBQuery
 struct WorkoutEditView: View {
+    // MARK: - Properties
+    
     let workout: WorkoutRecord
     
-    // States
+    // Environment
     @Environment(\.appDatabase) private var appDatabase
-    @Namespace var namespace
+    @Environment(\.dismiss) private var dismiss
+    
+    // Namespace for matched geometry effects
+    @Namespace private var namespace
+    
+    // State variables for UI management
     @State private var opacity = CGFloat.zero
     @State private var blur = CGFloat.zero
     @State private var isTimerVisible = false
     @State private var showKeyboardButtons = false
-    @State private var offset : CGFloat = .zero
+    @State private var showDistribution = false
+    @Query<ActivePrimaryMuscleRequest>
+    private var activePrimaryMuscles: Set<MuscleGroup>
+    @Query<ActiveSecondaryMusclesRequest>
+    private var activeSecondaryMuscles: Set<MuscleGroup>
+    // Toolbar controller instance
     @State private var toolbarVC = ToolbarVC()
+    
+    // MARK: - Initializer
+    
     init(workout: WorkoutRecord) {
         self.workout = workout
+        self._activePrimaryMuscles = Query(ActivePrimaryMuscleRequest(workoutId: workout.id!))
+        self._activeSecondaryMuscles = Query(ActiveSecondaryMusclesRequest(workoutId: workout.id!))
     }
+    
+    // MARK: - Body
+    
     var body: some View {
-        ScrollView{
-            VStack{
-                WorkoutNameEditor(workout: workout)
-                WorkoutRecordInfo(workout: workout)
-                    .onScrollVisibilityChange { changed in
-                        isTimerVisible = !changed
-                    }
-                WorkoutExercisesView(workoutID: workout.id!)
-                AddExercisesButton()
-            }
-        }
-        .environment(toolbarVC)
-        .scrollDismissesKeyboard(.interactively)
-        .toolbarTitleDisplayMode(.inline)
-        .onChange(of: isTimerVisible) { oldValue, newValue in
-            withAnimation(.snappy(duration: 0.65, extraBounce: 0.07)){
-                opacity = opacity == 0 ? 1 : 0
-                blur = blur == 0 ? 0 : 1
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                WorkoutTimer(date: workout.creationDate ?? .now)
-                    .opacity(opacity)
-                    .blur(radius: blur)
-            }
-            ToolbarItem(placement: .bottomBar) {
-                Button {
+        NavigationStack {
+            ScrollView {
+                VStack {
+                    WorkoutNameEditor(workout: workout)
                     
-                } label: {
-                    Label("Cancel Workout", systemImage: "trash")
-                }
-                .modify({ view in
-                    if #available(iOS 26, *){
-                        view
-                            .glassEffect(.regular.interactive().tint(.theme.primary.opacity(0.3)), in: .capsule)
-                    }
-                })
-                .buttonStyle(.borderless)
-            }
-            ToolbarItem(placement: .bottomBar) {
-                    
-                    Button{
-                        
-                    } label: {
-                        Text("Add Exercises")
-                    }
-                    .modify({ view in
-                        if #available(iOS 26, *){
-                            view
-                                .glassEffect(.regular.interactive().tint(.theme.primary.opacity(0.3)), in: .capsule)
+                    WorkoutRecordInfo(workout: workout)
+                        .onScrollVisibilityChange { changed in
+                            isTimerVisible = !changed
                         }
-                    })
-                    .buttonStyle(.borderless)
+                    
+                    WorkoutExercisesView(workoutID: workout.id!)
+                    
+                    AddExercisesButton()
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        
+                    }label: {
+                        Image(systemName: "trash.fill")
+                            .font(.title3.bold())
+                    }
+                    .tint(.theme.danger)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showDistribution = true
+                    } label: {
+                        Image(systemName: "figure")
+                            .font(.title3.bold())
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        finishWorkout()
+                        dismiss()
+                    }label:{
+                        Image(systemName: "trophy.fill")
+                            .font(.title3.bold())
+                    }
+                    .tint(.theme.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .background(LinearGradient(colors: [.bg, .bgDark], startPoint: .top, endPoint: .bottom))
+            .environment(toolbarVC)
+            .scrollDismissesKeyboard(.interactively)
+            .toolbarTitleDisplayMode(.inline)
+            .onChange(of: isTimerVisible) { oldValue, newValue in
+                withAnimation(.snappy(duration: 0.65, extraBounce: 0.07)) {
+                    opacity = opacity == 0 ? 1 : 0
+                    blur = blur == 0 ? 0 : 1
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                if showKeyboardButtons {
+                    ToolbarControls(toolbarVC: toolbarVC)
+                }
+            }
+            .animation(.bouncy(duration: 0.25), value: showKeyboardButtons)
+            .onAppear {
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillShowNotification,
+                    object: nil,
+                    queue: .main
+                ) { _ in
+                    DispatchQueue.main.async { showKeyboardButtons = true }
+                }
+                
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillHideNotification,
+                    object: nil,
+                    queue: .main
+                ) { _ in
+                    DispatchQueue.main.async {
+                        showKeyboardButtons = false
+                        toolbarVC.fieldType = nil
+                    }
+                }
             }
         }
-        .safeAreaInset(edge: .bottom, content: {
-            if showKeyboardButtons {
-                ToolbarControls(toolbarVC: toolbarVC)
-            }
+        .sheet(isPresented: $showDistribution, content: {
+            MuscleDistributionView(activePrimaryMuscles: activePrimaryMuscles, activeSecondaryMuscles: activeSecondaryMuscles)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.medium])
         })
-        .animation(.bouncy(duration: 0.25), value: showKeyboardButtons)
-        .onAppear {
-            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { noti in
-                DispatchQueue.main.async { self.showKeyboardButtons = true }
-            }
-            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { noti in
-                DispatchQueue.main.async {
-                    self.showKeyboardButtons = false
-                    toolbarVC.fieldType = nil
-                }
+    }
+}
+
+// MARK: - Private Methods
+
+private extension WorkoutEditView {
+    func finishWorkout() {
+        Task { @MainActor in
+            do {
+                var updatedWorkout = workout
+                updatedWorkout.endDate = Date()
+                _ = try await appDatabase.updateWorkout(updatedWorkout)
+            } catch {
+                // Handle error if needed
             }
         }
     }
+    
     func addExercisesToWorkout(exerciseIds: [String]) {
         Task { @MainActor in
             do {
                 try await appDatabase.addExercisesToWorkoutWithPreviousSets(exerciseIds: exerciseIds, to: workout.id!)
             } catch {
-                
+                // Handle error if needed
             }
         }
     }
     
     @ViewBuilder
     func AddExercisesButton() -> some View {
-        VStack{
+        VStack {
             NavigationLink {
                 ExerciseListView(appDatabase: appDatabase) { exercises in
                     addExercisesToWorkout(exerciseIds: exercises)
@@ -128,18 +178,16 @@ struct WorkoutEditView: View {
             }
             .contentShape(.rect)
             .foregroundStyle(.primary)
-            .modify {
+            .modify({ view in
                 if #available(iOS 26, *) {
-                    $0
-                        .glassEffect(.clear.interactive().tint(.red.mix(with: .green, by: 0.5)), in: .rect(cornerRadius: 12))
-                }else {
-                    $0
-                        .background(.regularMaterial)
-                        .cornerRadius(12)
+                    view
+                        .glassEffect(.regular.interactive().tint(.theme.primary.opacity(0.6)), in: .rect(cornerRadius: 12))
+                } else {
+                    view
+                        .background(Color.theme.primary, in: .rect(cornerRadius: 12))
                 }
-            }
+            })
         }
         .padding(10)
     }
 }
-

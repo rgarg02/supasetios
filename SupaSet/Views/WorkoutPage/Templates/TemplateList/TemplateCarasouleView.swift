@@ -97,13 +97,13 @@ struct TemplateCardView: View {
         .frame(height: 160)
         .frame(maxWidth: .infinity, maxHeight: .infinity,alignment: .leading)
         .padding(8)
-        .cornerRadius(12)
+        .cornerRadius(24)
         .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .fill(LinearGradient(colors: [.bgLight, .bg, .bg], startPoint: .top, endPoint: .bottom))
         )
         .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(LinearGradient(colors: [.highlight, .border], startPoint: .top, endPoint: .bottom), lineWidth: 1)
         }
     }
@@ -171,13 +171,13 @@ struct StartNewWorkoutButton: View {
             }
             .padding(5)
         }
-        .cornerRadius(4)
+        .cornerRadius(16)
         .background(
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(.bgLight)
         )
         .overlay {
-            RoundedRectangle(cornerRadius: 4, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(.border, lineWidth: 1)
         }
         .buttonStyle(.plain)

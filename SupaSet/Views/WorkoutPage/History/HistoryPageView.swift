@@ -13,25 +13,23 @@ struct HistoryPageView: View {
     private var workouts: [WorkoutRecord]
     @Namespace var namespace
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack {
-                    ForEach(workouts, id: \.id) {workout in
-                        NavigationLink {
-                            WorkoutEditView(workout: workout)
-                                .navigationTransition(.zoom(sourceID: workout.id, in: namespace))
-                                
-                        } label: {
-                            WorkoutRowView(workout: workout)
-                                .padding(.horizontal)
-                                .matchedTransitionSource(id: workout.id, in: namespace)
-                        }
-                        .buttonStyle(.plain)
+        ScrollView {
+            VStack {
+                ForEach(workouts, id: \.id) {workout in
+                    NavigationLink {
+                        WorkoutEditView(workout: workout)
+                            .navigationTransition(.zoom(sourceID: workout.id, in: namespace))
+                        
+                    } label: {
+                        WorkoutRowView(workout: workout)
+                            .padding(.horizontal)
+                            .matchedTransitionSource(id: workout.id, in: namespace)
                     }
+                    .buttonStyle(.plain)
                 }
             }
-            .navigationTitle("History")
         }
+        .navigationTitle("History")
     }
 }
 struct WorkoutRowView: View {

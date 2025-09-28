@@ -16,7 +16,7 @@ struct ToolbarControls: View {
                 Button {
                     toolbarVC.moveToNextField()
                 } label: {
-                    Image(systemName: "arrowshape.right")
+                    Image(systemName: "arrowshape.right.fill")
                         .font(.title2)
                         .fontWeight(.medium)
                 }
