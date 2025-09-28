@@ -14,11 +14,14 @@ struct HistoryPageView: View {
     @Namespace var namespace
     var body: some View {
         ScrollView {
+            if workouts.isEmpty {
+                ContentUnavailableView("No workouts yet...", image: "figure" , description: Text("Start a workout to see it here."))
+            }
             VStack {
                 ForEach(workouts, id: \.id) {workout in
                     NavigationLink {
-                        WorkoutEditView(workout: workout)
-                            .navigationTransition(.zoom(sourceID: workout.id, in: namespace))
+//                        WorkoutEditView(workout: workout)
+//                            .navigationTransition(.zoom(sourceID: workout.id, in: namespace))
                         
                     } label: {
                         WorkoutRowView(workout: workout)

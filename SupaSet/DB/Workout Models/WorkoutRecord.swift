@@ -1,10 +1,6 @@
 import GRDB
 import Foundation
 
-struct FullWorkout: Decodable, FetchableRecord, Equatable {
-    var workout: WorkoutRecord
-    var fullExercise: [FullExercise]
-}
 struct WorkoutRecord: Codable, FetchableRecord, Equatable {
     static let databaseTableName = "workout"
 

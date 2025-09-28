@@ -3,11 +3,11 @@ import Playgrounds
 import Foundation
 
 
-struct FullExercise: Decodable, FetchableRecord, Equatable {
+struct WorkoutExerciseWithSets: Decodable, FetchableRecord, Equatable, Hashable{
     var workoutExercise: WorkoutExerciseRecord
     var exerciseSets: [ExerciseSetRecord]
 }
-struct WorkoutExerciseRecord: Codable, FetchableRecord, PersistableRecord, Equatable {
+struct WorkoutExerciseRecord: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable {
     static let databaseTableName = "workoutExercise"
 
     var id: Int64?

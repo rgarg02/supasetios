@@ -34,7 +34,7 @@ struct TemplateExerciseSet: Codable, Hashable, Identifiable, FetchableRecord {
     var id: Int64?
     var templateExerciseId: Int64?
     var repType: RepType
-    var weight: Double?
+    var weight: Double
     private(set) var type: String
     var rpe: Double?
     var notes: String?
@@ -61,7 +61,7 @@ struct TemplateExerciseSet: Codable, Hashable, Identifiable, FetchableRecord {
     init(id: Int64? = nil,
          templateExerciseId: Int64? = nil,
          repType: RepType = .reps(nil),
-         weight: Double? = nil,
+         weight: Double = 0,
          type: SetType,
          rpe: Double? = nil,
          notes: String? = nil,

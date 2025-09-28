@@ -9,6 +9,20 @@ import SwiftUI
 import GRDBQuery
 import GRDB
 
+@available(iOS 26, *)
+struct BottomAccessory<Expanded: View, Inline: View>: View {
+    @Environment(\.tabViewBottomAccessoryPlacement) var tabViewBottomAccessoryPlacement
+    @ViewBuilder var expanded: Expanded
+    @ViewBuilder var inline: Inline
+    var body: some View {
+        switch tabViewBottomAccessoryPlacement {
+        case .expanded:
+            expanded
+        default:
+            inline
+        }
+    }
+}
 struct ContentView: View {
     @Environment(\.appDatabase) private var appDatabase
     @Query(OngoingWorkoutQuery())
@@ -24,12 +38,22 @@ struct ContentView: View {
                     .tabBarMinimizeBehavior(.onScrollDown)
                     .tabViewBottomAccessory {
                         if let ongoingWorkout {
-                            MiniWorkoutView(ongoingWorkout)
-                                .matchedTransitionSource(id: "MINIWORKOUT", in: animation)
-                                .contentShape(.rect)
-                                .onTapGesture {
-                                    expandWorkout.toggle()
-                                }
+                            BottomAccessory {
+                                MiniWorkoutView(ongoingWorkout)
+                                    .matchedTransitionSource(id: "MINIWORKOUT", in: animation)
+                                    .contentShape(.rect)
+                                    .onTapGesture {
+                                        expandWorkout.toggle()
+                                    }
+                            } inline: {
+                                MiniWorkoutView(ongoingWorkout)
+                                    .matchedTransitionSource(id: "MINIWORKOUT", in: animation)
+                                    .contentShape(.rect)
+                                    .onTapGesture {
+                                        expandWorkout.toggle()
+                                    }
+                            }
+
                         }
                     }
             } else {
@@ -67,40 +91,40 @@ struct ContentView: View {
                     .navigationTransition(.zoom(sourceID: "MINIWORKOUT", in: animation))
             }
         }
-        .background(.red)
-        .animation(.easeInOut, value: expandWorkout)
     }
     
     /// Let's First Start with TabView
     @ViewBuilder
     func NativeTabView(_ safeAreaBottomPadding: CGFloat = 0) -> some View {
         TabView(selection: $selectedTab) {
-            NavigationStack {
-                WorkoutPageView()
-                    .navigationTitle("Home")
-                    .safeAreaPadding(.bottom, safeAreaBottomPadding)
-                    .background(LinearGradient(colors: [.bg, .bgDark], startPoint: .top, endPoint: .bottom))
-                    .toolbar {
-                        ToolbarItem(placement: .automatic) {
-                            Button {
-                                Task {
-                                    do {
-                                        if ongoingWorkout == nil {
-                                            try await appDatabase.startWorkout(name: "New Workout", notes: "")
-                                        } else {
+            Tab(value: .home){
+                NavigationStack{
+                    WorkoutPageView()
+                        .navigationTitle("Home")
+                        .safeAreaPadding(.bottom, safeAreaBottomPadding)
+                        .background(LinearGradient(colors: [.bg, .bgDark], startPoint: .top, endPoint: .bottom))
+                        .toolbar {
+                            ToolbarItem(placement: .automatic) {
+                                Button {
+                                    Task {
+                                        do {
+                                            if ongoingWorkout == nil {
+                                                try await appDatabase.startWorkout(name: "New Workout", notes: "")
+                                                expandWorkout = true
+                                            } else {
+                                            }
+                                        } catch {
+                                            // Handle potential errors during workout creation/action
+                                            print("Error during workout action: \(error.localizedDescription)")
                                         }
-                                    } catch {
-                                        // Handle potential errors during workout creation/action
-                                        print("Error during workout action: \(error.localizedDescription)")
                                     }
+                                } label: {
+                                    Label(ongoingWorkout == nil ? "Start Workout" : "Edit Workout", systemImage: ongoingWorkout == nil ? "plus" : "pencil")
                                 }
-                            } label: {
-                                Label(ongoingWorkout == nil ? "Start Workout" : "Edit Workout", systemImage: ongoingWorkout == nil ? "plus" : "pencil")
                             }
                         }
-                    }
-            }
-            .tabItem {
+                }
+            } label: {
                 Label {
                     Text("Home")
                 } icon: {
@@ -109,14 +133,14 @@ struct ContentView: View {
                         .environment(\.symbolVariants, .none)
                 }
             }
-            .tag(Tabs.home)
             
-            NavigationStack {
-                HistoryPageView()
-                    .safeAreaPadding(.bottom, safeAreaBottomPadding)
-                    .background(LinearGradient(colors: [.bg, .bgDark], startPoint: .top, endPoint: .bottom))
-            }
-            .tabItem {
+            Tab(value: .history) {
+                NavigationStack {
+                    HistoryPageView()
+                        .safeAreaPadding(.bottom, safeAreaBottomPadding)
+                        .background(LinearGradient(colors: [.bg, .bgDark], startPoint: .top, endPoint: .bottom))
+                }
+            } label: {
                 Label {
                     Text("History")
                 } icon: {
@@ -124,15 +148,14 @@ struct ContentView: View {
                         .environment(\.symbolVariants, .none)
                 }
             }
-            .tag(Tabs.history)
             
-            // Profile Tab
-            NavigationStack {
-                ProfilePageView()
-                    .safeAreaPadding(.bottom, safeAreaBottomPadding)
-                    .background(LinearGradient(colors: [.bg, .bgDark], startPoint: .top, endPoint: .bottom))
-            }
-            .tabItem {
+            Tab(value: .profile){
+                NavigationStack {
+                    ProfilePageView()
+                        .safeAreaPadding(.bottom, safeAreaBottomPadding)
+                        .background(LinearGradient(colors: [.bg, .bgDark], startPoint: .top, endPoint: .bottom))
+                }
+            } label: {
                 Label {
                     Text("Profile")
                 } icon: {
@@ -140,9 +163,7 @@ struct ContentView: View {
                         .environment(\.symbolVariants, .none)
                 }
             }
-            .tag(Tabs.profile)
         }
-        // Apply the tint to the entire TabView
         .tint(Color.theme.primary)
     }
     

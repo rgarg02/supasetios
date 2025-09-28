@@ -178,32 +178,4 @@ extension AppDatabase {
                 .fetchAll(db)
         }
     }
-    
-    /// Fetches a full workout (including exercises and their sets) for a given workout ID
-    func fetchFullWorkout(for workoutId: Int64) async throws -> FullWorkout? {
-        return try await reader.read { db in
-            // 1. Fetch the WorkoutRecord
-            guard let workout = try WorkoutRecord.filter(WorkoutRecord.Columns.id == workoutId).fetchOne(db) else {
-                return nil
-            }
-            // 2. Fetch all WorkoutExerciseRecords for the workout
-            let workoutExercises = try WorkoutExerciseRecord
-                .filter(WorkoutExerciseRecord.Columns.workoutId == workoutId)
-                .order(WorkoutExerciseRecord.Columns.order)
-                .fetchAll(db)
-
-            // 3. For each exercise, fetch associated sets and build FullExercise
-            let fullExercises: [FullExercise] = try workoutExercises.map { workoutExercise in
-                let sets = try ExerciseSetRecord
-                    .filter(ExerciseSetRecord.Columns.workoutExerciseId == workoutExercise.id)
-                    .order(ExerciseSetRecord.Columns.order)
-                    .fetchAll(db)
-
-                return FullExercise(workoutExercise: workoutExercise, exerciseSets: sets)
-            }
-
-            // 4. Return as FullWorkout
-            return FullWorkout(workout: workout, fullExercise: fullExercises)
-        }
-    }
 }

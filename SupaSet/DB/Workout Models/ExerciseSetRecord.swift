@@ -1,7 +1,7 @@
 import GRDB
 import SwiftUI
 
-struct ExerciseSetRecord: Codable, FetchableRecord, PersistableRecord, Equatable {
+struct ExerciseSetRecord: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable {
     static let databaseTableName = "exerciseSet"
 
     var id: Int64?                   // Changed

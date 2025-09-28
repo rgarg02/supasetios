@@ -22,24 +22,28 @@ struct EditTemplateView: View {
     var body: some View {
         VStack {
             ScrollView {
-                TemplateNameEditor(templateName: workoutTemplate.name) { newName in
+                NameEditor(name: workoutTemplate.name) { newName in
                     workoutTemplate.name = newName
                 }
-                TemplateRecordInfo(template: workoutTemplate) { newNotes in
+                RecordInfo(creationDate: workoutTemplate.creationDate, modificationDate: workoutTemplate.modificationDate, notes: workoutTemplate.notes, showTimer: false) { newNotes in
                     workoutTemplate.notes = newNotes
                 }
-                EditTemplateExercisesView(templateExercisesWithSet: $templateExercises)
+                EditExercisesView(exercisesWithSets: $templateExercises)
                 AddExercisesButton()
             }
             .scrollDismissesKeyboard(.interactively)
         }
+        .onChange(of: templateExercises, { oldValue, newValue in
+            print("changed")
+        })
+        .background(LinearGradient(colors: [.bg, .bgDark], startPoint: .top, endPoint: .bottom))
         .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
                 Button {
                     saveTemplate()
                     dismiss()
                 } label: {
-                    Label("Finish", systemImage: "flag.pattern.checkered")
+                    Label("\(isNew ? "Add" : "Save") Template", systemImage: "\(isNew ? "plus" : "checkmark")")
                 }
             }
         }

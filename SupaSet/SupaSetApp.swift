@@ -7,7 +7,6 @@
 
 import SwiftUI
 import GRDBQuery
-import SwiftfulRouting
 @main
 struct SupaSetApp: App {
     @State private var selectedMusce: MuscleGroup?

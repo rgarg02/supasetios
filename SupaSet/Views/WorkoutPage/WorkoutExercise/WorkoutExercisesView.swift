@@ -15,7 +15,9 @@ struct WorkoutExercisesView: View {
     @Environment(\.appDatabase) private var appDatabase
     @Query<WorkoutExercisesRequest>
     private var exercises: [WorkoutExerciseWithExercise]
-    init(workoutID: Int64) {
+    let isNew: Bool
+    init(workoutID: Int64, isNew: Bool) {
+        self.isNew = isNew
         _exercises = Query(WorkoutExercisesRequest(workoutId: workoutID))
     }
     let padding: CGFloat = 10
@@ -26,7 +28,7 @@ struct WorkoutExercisesView: View {
             let exercise = exercise.exercise
             VStack {
                 HStack {
-                    ExerciseNameView(name: exercise?.name ?? "No Exercise Found")
+                    ExerciseNameView(exerciseId: workoutExercise.exerciseID)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     ExerciseOptions {
                         deleteExercise(workoutExercise)
@@ -82,9 +84,4 @@ struct WorkoutExercisesView: View {
                 .frame(width: 40)
         }
     }
-}
-
-#Preview {
-    WorkoutExercisesView(workoutID: 1)
-        .appDatabase(.workoutWithPopulatedExercise(workoutId: 1))
 }

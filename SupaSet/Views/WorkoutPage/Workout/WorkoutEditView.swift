@@ -11,8 +11,9 @@ import GRDBQuery
 struct WorkoutEditView: View {
     // MARK: - Properties
     
-    let workout: WorkoutRecord
-    
+    @State private var workout: WorkoutRecord
+    @State private var workoutExercisesWithSets: [WorkoutExerciseWithSets]
+    let isNew: Bool
     // Environment
     @Environment(\.appDatabase) private var appDatabase
     @Environment(\.dismiss) private var dismiss
@@ -32,11 +33,12 @@ struct WorkoutEditView: View {
     private var activeSecondaryMuscles: Set<MuscleGroup>
     // Toolbar controller instance
     @State private var toolbarVC = ToolbarVC()
-    
     // MARK: - Initializer
     
-    init(workout: WorkoutRecord) {
-        self.workout = workout
+    init(workout: WorkoutRecord, workoutExercisesWithSets: [WorkoutExerciseWithSets], isNew: Bool = true) {
+        self._workout = State(initialValue: workout)
+        self._workoutExercisesWithSets = State(initialValue: workoutExercisesWithSets)
+        self.isNew = isNew
         self._activePrimaryMuscles = Query(ActivePrimaryMuscleRequest(workoutId: workout.id!))
         self._activeSecondaryMuscles = Query(ActiveSecondaryMusclesRequest(workoutId: workout.id!))
     }
@@ -47,15 +49,40 @@ struct WorkoutEditView: View {
         NavigationStack {
             ScrollView {
                 VStack {
-                    WorkoutNameEditor(workout: workout)
-                    
-                    WorkoutRecordInfo(workout: workout)
-                        .onScrollVisibilityChange { changed in
-                            isTimerVisible = !changed
+                    NameEditor(name: workout.name){ newName in
+                        if isNew {
+                            Task {@MainActor in
+                                var mutableWorkout = workout
+                                mutableWorkout.name = newName
+                                do {
+                                    _ = try await appDatabase.updateWorkout(mutableWorkout)
+                                } catch {
+                                    
+                                }
+                            }
+                        }else {
+                            workout.name = newName
                         }
-                    
-                    WorkoutExercisesView(workoutID: workout.id!)
-                    
+                    }
+                    RecordInfo(creationDate: workout.creationDate, modificationDate: workout.modificationDate, notes: workout.notes, showTimer: true) {newNotes in
+                        if isNew {
+                            Task {@MainActor in
+                                var mutableWorkout = workout
+                                mutableWorkout.notes = newNotes
+                                do {
+                                    _ = try await appDatabase.updateWorkout(mutableWorkout)
+                                } catch {
+                                    
+                                }
+                            }
+                        }else {
+                            workout.notes = newNotes
+                        }
+                    }
+                    .onScrollVisibilityChange { visible in
+                        isTimerVisible = visible
+                    }
+                    WorkoutExercisesView(workoutID: workout.id!, isNew: isNew)
                     AddExercisesButton()
                 }
             }
@@ -79,8 +106,12 @@ struct WorkoutEditView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        finishWorkout()
-                        dismiss()
+                        if isNew {
+                            finishWorkout()
+                            dismiss()
+                        } else {
+                            
+                        }
                     }label:{
                         Image(systemName: "trophy.fill")
                             .font(.title3.bold())
@@ -133,6 +164,7 @@ struct WorkoutEditView: View {
         })
     }
 }
+
 
 // MARK: - Private Methods
 

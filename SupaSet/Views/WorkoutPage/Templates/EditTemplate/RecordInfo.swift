@@ -15,11 +15,13 @@
 
 import SwiftUI
 
-struct TemplateRecordInfo: View {
-    let template: WorkoutTemplate
+struct RecordInfo: View {
+    let creationDate: Date?
+    let modificationDate: Date?
+    let notes: String
+    let showTimer: Bool
     var updateNotes: ((String) -> ())
-    
-    @State private var templateNotes: String = ""
+    @State private var editableNotes: String = ""
     @State private var debouncedNotes: String = ""
     @FocusState private var isFocused: FieldType?
     let fieldType = FieldType.workoutNotes
@@ -27,12 +29,15 @@ struct TemplateRecordInfo: View {
     @Environment(ToolbarVC.self) private var toolbarVC
     var body: some View {
         VStack(spacing: 20) {
-            if let creationDate = template.creationDate, let modificationDate = template.modificationDate {
+            if let creationDate, let modificationDate {
                 HStack(spacing: 15) {
                     HStack(spacing: 5) {
                         Image(systemName: "calendar")
                         Text(creationDate.formatted())
                             .frame(alignment: .leading)
+                    }
+                    if showTimer {
+                        WorkoutTimer(date: creationDate)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -44,7 +49,7 @@ struct TemplateRecordInfo: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             ZStack(alignment: .topLeading) {
-                TextEditor(text: $templateNotes)
+                TextEditor(text: $editableNotes)
                     .multilineTextAlignment(.leading)
                     .font(font)
                     .padding()
@@ -56,7 +61,7 @@ struct TemplateRecordInfo: View {
                             .fill(.regularMaterial)
                     }
                     .textEditorStyle(.plain)
-                if templateNotes.isEmpty {
+                if editableNotes.isEmpty {
                     Text("Add your notes here")
                         .font(font)
                         .padding(EdgeInsets(top: 7, leading: 4, bottom: 0, trailing: 0))
@@ -67,12 +72,12 @@ struct TemplateRecordInfo: View {
         }
         .padding()
         .onAppear {
-            templateNotes = template.notes
-            debouncedNotes = template.notes
+            editableNotes = notes
+            debouncedNotes = notes
         }
-        .debounced(value: $templateNotes, debouncedValue: $debouncedNotes)
+        .debounced(value: $editableNotes, debouncedValue: $debouncedNotes)
         .onChange(of: debouncedNotes) { oldValue, newValue in
-            if newValue != template.notes {
+            if newValue != notes {
                 updateNotes(newValue)
             }
         }
@@ -90,10 +95,4 @@ struct TemplateRecordInfo: View {
             toolbarVC.allFields.insert(fieldType)
         }
     }
-}
-
-#Preview {
-    let workout = WorkoutRecord(id: 1, name: "New Workout", notes: "")
-    WorkoutRecordInfo(workout: workout)
-        .appDatabase(.workoutWithPopulatedExercise(workoutId: 1))
 }

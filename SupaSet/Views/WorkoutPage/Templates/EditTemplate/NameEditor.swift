@@ -14,28 +14,28 @@
 
 import SwiftUI
 
-struct TemplateNameEditor: View {
-    let templateName: String
+struct NameEditor: View {
+    let name: String
     var onChange: ((String) -> ())
-    @State private var templateNameEditable: String = ""
+    @State private var editableName: String = ""
     @State private var debouncedName: String = ""
     var font: Font = .title
     var body: some View {
-        TextField("New Workout", text: $templateNameEditable)
+        TextField("New Workout", text: $editableName)
             .multilineTextAlignment(.center)
             .font(font.bold())
             .textFieldStyle(.plain)
             .submitLabel(.done)
             .frame(maxWidth: .infinity, alignment: .center)
             .onAppear {
-                templateNameEditable = templateName
-                debouncedName = templateName
+                editableName = name
+                debouncedName = name
             }
             .onChange(of: debouncedName) { oldValue, newValue in
-                if newValue != templateName {
+                if newValue != name {
                     onChange(newValue)
                 }
             }
-            .debounced(value: $templateNameEditable, debouncedValue: $debouncedName)
+            .debounced(value: $editableName, debouncedValue: $debouncedName)
     }
 }
