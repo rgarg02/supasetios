@@ -15,10 +15,10 @@ struct CompletionIndicatorView: View {
         } label: {
             Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
                 .font(.system(size: 28, weight: .bold))
-                .foregroundColor(isDone ? .green : .gray.opacity(0.8))
+                .foregroundColor(isDone ? .success : .gray.opacity(0.8))
         }
         .contentTransition(.symbolEffect(.replace, options: .speed(2)))
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.borderless)
         .frame(maxWidth: .infinity)
         .animation(.easeInOut(duration: 0.1), value: isDone)
     }

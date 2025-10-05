@@ -14,7 +14,7 @@ struct RepsView: View {
     @State private var debouncedReps: Int?
     let fieldType: FieldType
     @FocusState var focusedField: FieldType?
-    init(reps: Int, isDone: Bool, fieldType: FieldType, onChange: @escaping (Int) -> ()) {
+    init(reps: Int, isDone: Bool = false, fieldType: FieldType, onChange: @escaping (Int) -> ()) {
         self.reps = reps
         self.isDone = isDone
         self.onChange = onChange

@@ -24,6 +24,7 @@ struct ExerciseOptions: View {
                     Text("Replace Execise")
                 }
             }
+            .tint(.theme.primary)
             Button (role: .destructive){
                 onDelete()
                 

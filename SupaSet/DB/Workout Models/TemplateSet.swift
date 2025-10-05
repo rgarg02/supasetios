@@ -83,3 +83,27 @@ extension TemplateExerciseSet: MutablePersistableRecord {
         self.id = inserted.rowID
     }
 }
+extension TemplateExerciseSet {
+    init(_ exerciseSet: ExerciseSetRecord, id: Int64? = nil, templateExerciseId: Int64? = nil) {
+        self.id = id
+        self.templateExerciseId = templateExerciseId
+        self.repType = .reps(exerciseSet.reps)
+        self.weight = exerciseSet.weight
+        self.type = exerciseSet.setType.rawValue
+        self.rpe = exerciseSet.rpe
+        self.notes = exerciseSet.notes
+        self.order = exerciseSet.order
+    }
+}
+extension TemplateExerciseSet {
+    init(_ templateSet: TemplateExerciseSet?, order: Int) {
+        self.id = nil
+        self.templateExerciseId = templateSet?.templateExerciseId
+        self.repType = templateSet?.repType ?? .reps(nil)
+        self.weight = templateSet?.weight ?? .zero
+        self.notes = nil
+        self.order = order
+        self.type = templateSet?.type ?? SetType.working.rawValue
+        self.rpe = templateSet?.rpe ?? nil
+    }
+}

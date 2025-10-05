@@ -1,7 +1,7 @@
 import GRDB
 import Foundation
 
-struct WorkoutRecord: Codable, FetchableRecord, Equatable {
+struct WorkoutRecord: Codable, FetchableRecord, Equatable, Hashable {
     static let databaseTableName = "workout"
 
     var id: Int64? // Changed to auto-incrementing Int64

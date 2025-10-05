@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct MuscleDistributionView: View {
-    let activePrimaryMuscles: Set<MuscleGroup>
-    let activeSecondaryMuscles: Set<MuscleGroup>
+    var activePrimaryMuscles: Set<MuscleGroup>
+    var activeSecondaryMuscles: Set<MuscleGroup>
     @Binding var selectedMuscle: MuscleGroup?
     init(activePrimaryMuscles: Set<MuscleGroup>, activeSecondaryMuscles: Set<MuscleGroup>, selectedMuscle: Binding<MuscleGroup?> = .constant(nil)) {
         self.activePrimaryMuscles = activePrimaryMuscles

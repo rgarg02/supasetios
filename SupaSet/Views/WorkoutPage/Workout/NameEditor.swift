@@ -1,19 +1,10 @@
 //
-//  TemplateNameEditor.swift
+//  NameEditor.swift
 //  SupaSet
 //
-//  Created by Rishi Garg on 9/1/25.
+//  Created by Rishi Garg on 9/30/25.
 //
-
-//
-//  WorkoutNameEditor.swift
-//  SupaSet
-//
-//  Created by Rishi Garg on 8/20/25.
-//
-
 import SwiftUI
-
 struct NameEditor: View {
     let name: String
     var onChange: ((String) -> ())

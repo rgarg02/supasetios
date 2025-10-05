@@ -25,9 +25,6 @@ struct SceneKitContainer: UIViewRepresentable {
         let scene = SCNScene(named: modelName)
         sceneView.scene = scene
         applyDefaultMaterials(to: scene?.rootNode)
-        if let activePrimaryMuscles, let activeSecondaryMuscles {
-            applyHighlights(to: activePrimaryMuscles, secondaryMuscles: activeSecondaryMuscles, in: sceneView)
-        }
         // Enable user interaction
         sceneView.allowsCameraControl = true
         sceneView.autoenablesDefaultLighting = true
@@ -159,7 +156,20 @@ struct SceneKitContainer: UIViewRepresentable {
         }
 
     }
-    func updateUIView(_ uiView: SCNView, context: Context) {}
+    func updateUIView(_ uiView: SCNView, context: Context) {
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 0.65 // Adjust duration as needed
+        SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        // 1. First, reset all materials to default
+        applyDefaultMaterials(to: uiView.scene?.rootNode)
+        
+        // 2. Then, apply the new highlights
+        if let primary = activePrimaryMuscles, let secondary = activeSecondaryMuscles {
+            applyHighlights(to: primary, secondaryMuscles: secondary, in: uiView)
+        }
+        
+        SCNTransaction.commit()
+    }
     private func applyDefaultMaterials(to node: SCNNode?) {
         guard let node = node else { return }
         
@@ -185,10 +195,10 @@ struct SceneKitContainer: UIViewRepresentable {
     }
     private func applyHighlights(to primaryMuscles: Set<MuscleGroup>, secondaryMuscles: Set<MuscleGroup>, in sceneView: SCNView) {
         sceneView.scene?.rootNode.childNodes.forEach { node in
-            if primaryMuscles.map({$0.rawValue}).contains(node.name) {
+            if secondaryMuscles.map({$0.rawValue}).contains(node.name) {
                 node.geometry?.materials.forEach { material in
                     material.lightingModel = .physicallyBased
-                    material.diffuse.contents = UIColor.systemRed
+                    material.diffuse.contents = UIColor.systemYellow
                     material.metalness.contents = 0.05  // almost non-metallic
                     material.roughness.contents = 0.7   // matte, soft
                     material.specular.contents = UIColor(white: 1.0, alpha: 0.2) // subtle highlights
@@ -196,10 +206,10 @@ struct SceneKitContainer: UIViewRepresentable {
                     material.isDoubleSided = true
                 }
             }
-            if secondaryMuscles.map({$0.rawValue}).contains(node.name) {
+            if primaryMuscles.map({$0.rawValue}).contains(node.name) {
                 node.geometry?.materials.forEach { material in
                     material.lightingModel = .physicallyBased
-                    material.diffuse.contents = UIColor.systemYellow
+                    material.diffuse.contents = UIColor.systemRed
                     material.metalness.contents = 0.05  // almost non-metallic
                     material.roughness.contents = 0.7   // matte, soft
                     material.specular.contents = UIColor(white: 1.0, alpha: 0.2) // subtle highlights

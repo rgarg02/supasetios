@@ -2,40 +2,57 @@
 //  WorkoutRecordInfo.swift
 //  SupaSet
 //
-//  Created by Rishi Garg on 7/10/25.
+//  Created by Rishi Garg on 9/30/25.
 //
 
 import SwiftUI
-
-struct WorkoutRecordInfo: View {
+struct RecordInfo: View {
     @Environment(\.appDatabase) private var appDatabase
     @Environment(ToolbarVC.self) private var toolbarVC
-    let workout: WorkoutRecord
-    @State private var workoutNotes: String = ""
+    let creationDate: Date
+    let endDate: Date? 
+    let modificationDate: Date
+    let showTimer: Bool
+    var notes: String
+    var onChange: ((String) -> ())
+    @State private var editableNotes: String = ""
     @State private var debouncedNotes: String = ""
     @FocusState private var isFocused: FieldType?
     let fieldType = FieldType.workoutNotes
     var font: Font = .body
+    
+    init(creationDate: Date, endDate: Date? = nil, modificationDate: Date, showTimer: Bool = true, notes: String, onChange: @escaping (String) -> Void) {
+        self.showTimer = showTimer
+        self.creationDate = creationDate
+        self.endDate = endDate
+        self.modificationDate = modificationDate
+        self.notes = notes
+        self.onChange = onChange
+    }
     
     var body: some View {
         VStack(spacing: 20) {
             HStack(spacing: 15) {
                 HStack(spacing: 5) {
                     Image(systemName: "calendar")
-                    Text(workout.creationDate?.formatted() ?? Date().formatted())
+                    Text(creationDate.formatted())
                         .frame(alignment: .leading)
                 }
-                WorkoutTimer(date: workout.creationDate ?? .now)
+                if showTimer {
+                    WorkoutTimer(date: creationDate, endDate: endDate)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            HStack {
-                Text("Modified at:")
-                Text(workout.modificationDate?.formatted() ?? Date().formatted())
-                    .frame(alignment: .leading)
+            if endDate != nil {
+                HStack {
+                    Text("Modified at:")
+                    Text(modificationDate.formatted())
+                        .frame(alignment: .leading)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
             ZStack(alignment: .topLeading) {
-                TextEditor(text: $workoutNotes)
+                TextEditor(text: $editableNotes)
                     .multilineTextAlignment(.leading)
                     .font(font)
                     .padding()
@@ -48,7 +65,7 @@ struct WorkoutRecordInfo: View {
                             .stroke(toolbarVC.fieldType == fieldType ? Color.blue : Color.gray.opacity(0.2), lineWidth: 1)
                     }
                     .textEditorStyle(.plain)
-                if workoutNotes.isEmpty {
+                if editableNotes.isEmpty {
                     Text("Add your notes here")
                         .font(font)
                         .padding(EdgeInsets(top: 7, leading: 4, bottom: 0, trailing: 0))
@@ -59,13 +76,13 @@ struct WorkoutRecordInfo: View {
         }
         .padding()
         .onAppear {
-            workoutNotes = workout.notes
-            debouncedNotes = workout.notes
+            editableNotes = notes
+            debouncedNotes = notes
         }
-        .debounced(value: $workoutNotes, debouncedValue: $debouncedNotes)
+        .debounced(value: $editableNotes, debouncedValue: $debouncedNotes)
         .onChange(of: debouncedNotes) { oldValue, newValue in
-            if newValue != workout.notes {
-                updateNotes(newValue)
+            if newValue != notes {
+                onChange(newValue)
             }
         }
         .onChange(of: isFocused) { oldValue, newValue in
@@ -82,21 +99,4 @@ struct WorkoutRecordInfo: View {
             toolbarVC.allFields.insert(fieldType)
         }
     }
-    private func updateNotes(_ newNotes: String) {
-        Task { @MainActor in
-            do {
-                var updatedWorkout = workout
-                updatedWorkout.notes = newNotes
-                _ = try await appDatabase.updateWorkout(updatedWorkout)
-            } catch {
-                
-            }
-        }
-    }
-}
-
-#Preview {
-    let workout = WorkoutRecord(id: 1, name: "New Workout", notes: "")
-    WorkoutRecordInfo(workout: workout)
-        .appDatabase(.workoutWithPopulatedExercise(workoutId: 1))
 }

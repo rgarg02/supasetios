@@ -39,27 +39,6 @@ struct TemplateExerciseRequest: ValueObservationQueryable {
     }
 }
 
-struct TemplateExercisesWithSetsRequest: ValueObservationQueryable {
-    var templateId: Int64?
-    static var defaultValue: [TemplateExerciseWithSets] {[]}
-    
-    func fetch(_ db: Database) throws -> [TemplateExerciseWithSets] {
-        var output: [TemplateExerciseWithSets] = []
-        let exercises = try TemplateExercise
-            .filter({$0.templateId == templateId})
-            .order(\.order)
-            .fetchAll(db)
-        for exercise in exercises {
-            let sets = try TemplateExerciseSet
-             
-                .filter({$0.templateExerciseId == exercise.id})
-                .order(\.order)
-                .fetchAll(db)
-            output.append(.init(templateExercise: exercise, templateSets: sets))
-        }
-        return output
-    }
-}
 struct ExerciseNameWithCount: Identifiable {
     var id = UUID()
     let name: String

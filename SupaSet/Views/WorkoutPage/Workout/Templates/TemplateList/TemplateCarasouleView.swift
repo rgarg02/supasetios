@@ -11,6 +11,7 @@ import GRDBQuery
 struct TemplateCarasouleView: View {
     @Query(TemplateRequest())
     private var templates: [WorkoutTemplate]
+    @Environment(\.appDatabase) private var appDatabase
     @Namespace var namespace
     var body: some View {
         VStack {
@@ -18,7 +19,7 @@ struct TemplateCarasouleView: View {
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)], spacing: 16) {
                 ForEach(templates) {template in
                     NavigationLink {
-                        EditExistingWorkoutTemplate(template: template)
+                        EditTemplateView(appDatabase: appDatabase, workoutTemplate: template)
                             .navigationTransition(.zoom(sourceID: template.id, in: namespace))
                     } label: {
                         TemplateCardView(template: template)
@@ -38,7 +39,7 @@ struct TemplateCarasouleView: View {
                 .foregroundStyle(Color.theme.text)
             Spacer()
             NavigationLink {
-                EditTemplateView()
+                EditTemplateView(appDatabase: appDatabase)
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "plus")
@@ -63,18 +64,6 @@ struct TemplateCarasouleView: View {
             .buttonStyle(.plain)
         }
         .padding(.bottom, 16)
-    }
-}
-struct EditExistingWorkoutTemplate: View {
-    let template: WorkoutTemplate
-    @Query<TemplateExercisesWithSetsRequest>
-    private var templateExercisesWithSets: [TemplateExerciseWithSets]
-    init(template: WorkoutTemplate) {
-        self.template = template
-        self._templateExercisesWithSets = Query(TemplateExercisesWithSetsRequest(templateId: template.id))
-    }
-    var body: some View {
-        EditTemplateView(workoutTemplate: template, templateExercisesWithSets: templateExercisesWithSets)
     }
 }
 struct TemplateCardView: View {

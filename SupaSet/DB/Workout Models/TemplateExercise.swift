@@ -16,6 +16,17 @@
 import Foundation
 import GRDB
 
+
+struct FullTemplateExercise: Encodable, Hashable {
+    var templateExercise: TemplateExercise
+    var templateExerciseSets: [TemplateExerciseSet]
+}
+extension [TemplateExerciseSet] {
+    mutating func addSet() {
+        let previousSet = self.last
+        self.append(.init(previousSet, order: self.count))
+    }
+}
 struct TemplateExercise: Codable, Hashable, Identifiable, FetchableRecord {
     var id: Int64?
     var templateId: Int64?

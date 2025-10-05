@@ -5,7 +5,7 @@ struct ExerciseSetRecord: Codable, FetchableRecord, PersistableRecord, Equatable
     static let databaseTableName = "exerciseSet"
 
     var id: Int64?                   // Changed
-    var workoutExerciseId: Int64     // Changed (Foreign Key to WorkoutExerciseRecord.id)
+    var workoutExerciseId: Int64?     // Changed (Foreign Key to WorkoutExerciseRecord.id)
     var reps: Int
     var weight: Double
     private(set) var type: String    // Stores SetType raw value
@@ -31,10 +31,22 @@ struct ExerciseSetRecord: Codable, FetchableRecord, PersistableRecord, Equatable
     var workoutExercise: QueryInterfaceRequest<WorkoutExerciseRecord> {
         request(for: ExerciseSetRecord.workoutExercise)
     }
-
+    
+    // initialize with a copy
+    init(_ exerciseSet: ExerciseSetRecord, id: Int64? = nil, workoutExerciseId: Int64? = nil) {
+        self.id = id
+        self.workoutExerciseId = workoutExerciseId
+        self.reps = exerciseSet.reps
+        self.weight = exerciseSet.weight
+        self.type = exerciseSet.setType.rawValue
+        self.rpe = exerciseSet.rpe
+        self.notes = exerciseSet.notes
+        self.order = exerciseSet.order
+        self.isDone = false
+    }
     // Initialize with a SetType, storing its rawValue internally
     init(id: Int64? = nil,
-         workoutExerciseId: Int64,
+         workoutExerciseId: Int64? = nil,
          reps: Int,
          weight: Double,
          type: SetType,

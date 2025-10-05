@@ -22,7 +22,7 @@ struct WeightView: View {
         return formatter
     }()
     
-    init(weight: Double, isDone: Bool, fieldType: FieldType, onChange: @escaping (Double) -> ()) {
+    init(weight: Double, isDone: Bool = false, fieldType: FieldType, onChange: @escaping (Double) -> ()) {
         self.weight = weight
         self.isDone = isDone
         self.onChange = onChange

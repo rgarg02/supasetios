@@ -66,7 +66,7 @@ extension View {
     public func debounced<T: Equatable>(
         value: Binding<T>,
         debouncedValue: Binding<T>,
-        debounceSeconds: TimeInterval = 1.0
+        debounceSeconds: TimeInterval = 0.5
     ) -> some View {
         modifier(DebouncedModifier(value: value, debouncedValue: debouncedValue, debounceSeconds: debounceSeconds))
     }

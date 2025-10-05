@@ -10,6 +10,7 @@
 		D93BC86B2E0C622B00599B76 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = D93BC86A2E0C622B00599B76 /* GRDB */; };
 		D958BC1A2E5361F80099D5D4 /* GRDBQuery in Frameworks */ = {isa = PBXBuildFile; productRef = D958BC192E5361F80099D5D4 /* GRDBQuery */; };
 		D9889FDD2E60A346002CFEE1 /* SwiftCSV in Frameworks */ = {isa = PBXBuildFile; productRef = D9889FDC2E60A346002CFEE1 /* SwiftCSV */; };
+		D9BB937C2E8DB7E5009503F3 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = D9BB937B2E8DB7E5009503F3 /* SwiftUIIntrospect */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 				D9889FDD2E60A346002CFEE1 /* SwiftCSV in Frameworks */,
 				D958BC1A2E5361F80099D5D4 /* GRDBQuery in Frameworks */,
 				D93BC86B2E0C622B00599B76 /* GRDB in Frameworks */,
+				D9BB937C2E8DB7E5009503F3 /* SwiftUIIntrospect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +79,7 @@
 				D93BC86A2E0C622B00599B76 /* GRDB */,
 				D958BC192E5361F80099D5D4 /* GRDBQuery */,
 				D9889FDC2E60A346002CFEE1 /* SwiftCSV */,
+				D9BB937B2E8DB7E5009503F3 /* SwiftUIIntrospect */,
 			);
 			productName = SupaSet;
 			productReference = D93BC85B2E0C61EA00599B76 /* SupaSet.app */;
@@ -110,6 +113,7 @@
 				D93BC8692E0C622B00599B76 /* XCRemoteSwiftPackageReference "GRDB" */,
 				D958BC182E5361F80099D5D4 /* XCRemoteSwiftPackageReference "GRDBQuery" */,
 				D9889FDB2E60A346002CFEE1 /* XCRemoteSwiftPackageReference "SwiftCSV" */,
+				D9BB937A2E8DB7E4009503F3 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D93BC85C2E0C61EA00599B76 /* Products */;
@@ -383,6 +387,14 @@
 				minimumVersion = 0.10.0;
 			};
 		};
+		D9BB937A2E8DB7E4009503F3 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/swiftui-introspect";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 26.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -400,6 +412,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D9889FDB2E60A346002CFEE1 /* XCRemoteSwiftPackageReference "SwiftCSV" */;
 			productName = SwiftCSV;
+		};
+		D9BB937B2E8DB7E5009503F3 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D9BB937A2E8DB7E4009503F3 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
+			productName = SwiftUIIntrospect;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

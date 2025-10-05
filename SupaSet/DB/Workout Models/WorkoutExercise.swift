@@ -3,7 +3,7 @@ import Playgrounds
 import Foundation
 
 
-struct WorkoutExerciseWithSets: Decodable, FetchableRecord, Equatable, Hashable{
+struct FullExercise: Encodable, Hashable{
     var workoutExercise: WorkoutExerciseRecord
     var exerciseSets: [ExerciseSetRecord]
 }
@@ -11,7 +11,7 @@ struct WorkoutExerciseRecord: Codable, FetchableRecord, PersistableRecord, Equat
     static let databaseTableName = "workoutExercise"
 
     var id: Int64?
-    var workoutId: Int64
+    var workoutId: Int64?
     var exerciseID: String
     var order: Int
     var notes: String?
@@ -38,7 +38,7 @@ struct WorkoutExerciseRecord: Codable, FetchableRecord, PersistableRecord, Equat
         request(for: WorkoutExerciseRecord.exercise)
     }
     // Initializer updated
-    init(id: Int64? = nil, workoutId: Int64, exerciseID: String, order: Int, notes: String?) {
+    init(id: Int64? = nil, workoutId: Int64? = nil, exerciseID: String, order: Int, notes: String?) {
         self.id = id
         self.workoutId = workoutId
         self.exerciseID = exerciseID

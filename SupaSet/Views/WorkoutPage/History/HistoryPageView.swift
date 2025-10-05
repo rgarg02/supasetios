@@ -11,7 +11,9 @@ import GRDBQuery
 struct HistoryPageView: View {
     @Query(CompletedWorkoutsRequest())
     private var workouts: [WorkoutRecord]
-    @Namespace var namespace
+    @State private var selectedWorkout: WorkoutRecord?
+    @Namespace private var namespace
+    @Environment(\.appDatabase) private var appDatabase
     var body: some View {
         ScrollView {
             if workouts.isEmpty {
@@ -20,17 +22,16 @@ struct HistoryPageView: View {
             VStack {
                 ForEach(workouts, id: \.id) {workout in
                     NavigationLink {
-//                        WorkoutEditView(workout: workout)
-//                            .navigationTransition(.zoom(sourceID: workout.id, in: namespace))
-                        
+                        WorkoutEdit(appDatabase: appDatabase, workout: workout, isNew: false)
+                            .navigationTransition(.zoom(sourceID: workout.id, in: namespace))
                     } label: {
                         WorkoutRowView(workout: workout)
                             .padding(.horizontal)
                             .matchedTransitionSource(id: workout.id, in: namespace)
                     }
-                    .buttonStyle(.plain)
                 }
             }
+            .animation(.default, value: workouts)
         }
         .navigationTitle("History")
     }

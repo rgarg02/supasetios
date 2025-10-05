@@ -41,9 +41,9 @@ enum SetType: String, Codable, CaseIterable {
     var color: Color {
         switch self {
         case .failure:
-            return .red  // #FF3B30 : #B71C1C
+            return .danger  // #FF3B30 : #B71C1C
         case .working:
-            return .gray  // #34C759 : #2E7D32
+            return .text  // #34C759 : #2E7D32
         case .warmup:
             return .yellow  // #FF9500 : #E65100
         case .drop:
