@@ -11,10 +11,6 @@ import GRDB
 // MARK: - Database Access: Reads
 
 extension AppDatabase {
-    /// Provides a read-only access to the database.
-    var reader: any GRDB.DatabaseReader {
-        dbWriter
-    }
     
     // MARK: - Convenience Read Methods
     
@@ -58,6 +54,27 @@ extension AppDatabase {
                 .fetchAll(db)
         }
         return exercises.map({$0.name})
+    }
+    func fetchAllExercises(searchText: String = "") async throws -> [ExerciseRowDetail] {
+        let request = filteredExerciseRequest(searchText: searchText)
+        return try await reader.read { db in
+            let exercises =
+            try request
+                .order(Column("name").asc)
+                .fetchAll(db)
+            return try exercises.map { exercise in
+                let primaryMuscles = try ExercisePrimaryMuscle
+                    .filter(ExercisePrimaryMuscle.Columns.exerciseId == exercise.id)
+                    .fetchAll(db)
+                    .map(\.muscleGroup)
+                
+                let secondaryMuscles = try ExerciseSecondaryMuscle
+                    .filter(ExerciseSecondaryMuscle.Columns.exerciseId == exercise.id)
+                    .fetchAll(db)
+                    .map(\.muscleGroup)
+                return ExerciseRowDetail(id: exercise.id, name: exercise.name, force: exercise.force, level: exercise.level, equipment: exercise.equipment, primaryMuscles: primaryMuscles, category: exercise.category, frequency: exercise.frequency)
+            }
+        }
     }
     /// Fetch all exercises with their complete data, with pagination.
     /// - Parameters:

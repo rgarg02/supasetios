@@ -15,6 +15,7 @@
 
 import SwiftUI
 import GRDB
+
 @MainActor
 @Observable
 final class TemplateVM {
@@ -148,4 +149,5 @@ final class TemplateVM {
         }
     }
 }
+
 

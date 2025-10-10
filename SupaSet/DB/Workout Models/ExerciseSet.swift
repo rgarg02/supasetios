@@ -92,11 +92,11 @@ extension ExerciseSetRecord {
         switch templateSet.repType {
         case .reps(let newReps):
             reps = newReps ?? 0
-        case .range(let lowerBound, let upperBound):
+        case .range(let lowerBound, _):
             reps = lowerBound ?? 0
         }
         self.reps = reps
-        self.weight = templateSet.weight ?? 0
+        self.weight = templateSet.weight
         self.type = templateSet.type
         self.rpe = templateSet.rpe
         self.notes = templateSet.notes

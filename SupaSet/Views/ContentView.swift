@@ -13,14 +13,11 @@ struct ContentView: View {
     @Query(OngoingWorkoutQuery())
     private var ongoingWorkout: WorkoutRecord?
     @State private var expandWorkout: Bool = false
-    @State private var tab: Tabs = .home
-    @State private var workoutVM: WorkoutVM?
     @Namespace private var animation
-    enum Tabs {case home, profile, history, actionButton}
     var body: some View {
         Group {
             if #available(iOS 26, *) {
-                NativeTabView()
+                NativeTabView(appDatabase: appDatabase)
                     .tabBarMinimizeBehavior(.onScrollDown)
                     .tabViewBottomAccessory {
                         if let ongoingWorkout {
@@ -42,7 +39,7 @@ struct ContentView: View {
                     }
                     .animation(.default, value: ongoingWorkout)
             } else {
-                NativeTabView(60)
+                NativeTabView(60, appDatabase: appDatabase)
                     .overlay(alignment: .bottomTrailing) {
                         if let ongoingWorkout{
                             MiniWorkoutView(ongoingWorkout)
@@ -74,18 +71,6 @@ struct ContentView: View {
                     .ignoresSafeArea(.keyboard, edges: .all)
             }
         }
-        .onAppear {
-            if let ongoingWorkout {
-                workoutVM = WorkoutVM(workout: ongoingWorkout, appDatabase: appDatabase, isNew: true)
-            }
-        }
-        .onChange(of: ongoingWorkout, { oldValue, newValue in
-            if let newValue {
-                workoutVM = WorkoutVM(workout: newValue, appDatabase: appDatabase, isNew: true)
-            }else {
-                workoutVM = nil
-            }
-        })
         .fullScreenCover(isPresented: $expandWorkout) {
             if let ongoingWorkout, expandWorkout {
                 NavigationStack{
@@ -118,45 +103,6 @@ struct ContentView: View {
         .tint(.theme.primary)
         .offset(y: -52)
         .padding(.horizontal, 15)
-    }
-    /// Let's First Start with TabView
-    @ViewBuilder
-    func NativeTabView(_ safeAreaBottomPadding: CGFloat = 0) -> some View {
-        TabView(selection: $tab) {
-            Tab(value: .home) {
-                NavigationStack {
-                    WorkoutPageView()
-                        .navigationTitle("Home")
-                        .safeAreaPadding(.bottom, safeAreaBottomPadding)
-                        .background(LinearGradient(colors: [.bgDark, .bg], startPoint: .top, endPoint: .bottom))
-                }
-            } label : {
-                Label("Home", systemImage: tab == .home ? "house.fill" : "house")
-                    .environment(\.symbolVariants, .none)
-            }
-            Tab(value: .history) {
-                NavigationStack {
-                    HistoryPageView()
-                        .safeAreaPadding(.bottom, safeAreaBottomPadding)
-                        .background(LinearGradient(colors: [.bgDark, .bg], startPoint: .top, endPoint: .bottom))
-                }
-            } label : {
-                Label("History", systemImage: tab == .history ? "list.bullet.clipboard.fill" : "list.bullet.clipboard")
-                    .environment(\.symbolVariants, .none)
-            }
-            Tab(value: .profile) {
-                NavigationStack {
-                    ProfilePageView()
-                        .navigationTitle("Profile")
-                        .safeAreaPadding(.bottom, safeAreaBottomPadding)
-                        .background(LinearGradient(colors: [.bgDark, .bg], startPoint: .top, endPoint: .bottom))
-                }
-            } label : {
-                Label("Profile", systemImage: tab == .profile ? "person.fill" : "person")
-                    .environment(\.symbolVariants, .none)
-            }
-        }
-        .tint(.theme.primary)
     }
     
     /// Resuable Workout Info

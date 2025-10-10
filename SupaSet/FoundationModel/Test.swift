@@ -9,23 +9,34 @@ import Playgrounds
 import FoundationModels
 @available(iOS 26, *)
 @Generable
-struct Template {
-    let name: String
-    let exercises: [TemplateExerciseGen]
+struct TemplateSetGen {
+    @Generable
+    enum RepType{
+        case reps(Int)
+        case range(Int, Int)
+    }
+    @Generable
+    enum SetType: String {
+        case working, warmup, drop, failure
+    }
+    let repType: RepType
+    @Guide(description: "Weight for the set in KGs")
+    let weight: Double
+    @Guide(description: "Any notes regarding how to perform the set if the user asks")
+    let notes: String?
+    let setType: SetType
+    
 }
-
 @available(iOS 26, *)
 @Generable
-struct TemplateExerciseGen {
+struct TemplateExerciseGen{
+    let exerciseID: String
+    let templateSets: [TemplateSetGen]
+}
+@available(iOS 26, *)
+@Generable
+struct TemplateGen {
     let name: String
     let notes: String
-}
-#Playground {
-    if #available(iOS 26.0, *) {
-        let session = LanguageModelSession()
-        let result = try await session.respond(to: "Give me a workout template for a push day", generating: Template.self)
-        print(result.content)
-    } else {
-    }
-    
+    let templateExercises: [TemplateExerciseGen]
 }

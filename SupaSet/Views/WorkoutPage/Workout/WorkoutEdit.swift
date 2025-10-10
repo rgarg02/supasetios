@@ -28,10 +28,10 @@ struct WorkoutEdit: View {
     var body: some View {
         ScrollView {
             VStack {
-                NameEditor(name: workoutVM.workout.name) { newName in
+                NameEditor(name: $workoutVM.workout.name) { newName in
                     workoutVM.updateWorkoutName(to: newName)
                 }
-                RecordInfo(creationDate: workoutVM.workout.creationDate ?? .now, endDate: workoutVM.workout.endDate, modificationDate: workoutVM.workout.modificationDate ?? .now, notes: workoutVM.workout.notes) { newNotes in
+                RecordInfo(creationDate: workoutVM.workout.creationDate ?? .now, endDate: workoutVM.workout.endDate, modificationDate: workoutVM.workout.modificationDate ?? .now, notes: $workoutVM.workout.notes) { newNotes in
                     workoutVM.updateWorkoutNotes(to: newNotes)
                 }
                 WorkoutExercisesView(workoutVM: workoutVM)

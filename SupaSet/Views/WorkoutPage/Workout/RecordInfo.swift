@@ -13,20 +13,19 @@ struct RecordInfo: View {
     let endDate: Date? 
     let modificationDate: Date
     let showTimer: Bool
-    var notes: String
+    @Binding var notes: String
     var onChange: ((String) -> ())
-    @State private var editableNotes: String = ""
     @State private var debouncedNotes: String = ""
     @FocusState private var isFocused: FieldType?
     let fieldType = FieldType.workoutNotes
     var font: Font = .body
     
-    init(creationDate: Date, endDate: Date? = nil, modificationDate: Date, showTimer: Bool = true, notes: String, onChange: @escaping (String) -> Void) {
+    init(creationDate: Date, endDate: Date? = nil, modificationDate: Date, showTimer: Bool = true, notes: Binding<String>, onChange: @escaping (String) -> Void) {
         self.showTimer = showTimer
         self.creationDate = creationDate
         self.endDate = endDate
         self.modificationDate = modificationDate
-        self.notes = notes
+        self._notes = notes
         self.onChange = onChange
     }
     
@@ -52,7 +51,7 @@ struct RecordInfo: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             ZStack(alignment: .topLeading) {
-                TextEditor(text: $editableNotes)
+                TextEditor(text: $notes)
                     .multilineTextAlignment(.leading)
                     .font(font)
                     .padding()
@@ -65,7 +64,7 @@ struct RecordInfo: View {
                             .stroke(toolbarVC.fieldType == fieldType ? Color.blue : Color.gray.opacity(0.2), lineWidth: 1)
                     }
                     .textEditorStyle(.plain)
-                if editableNotes.isEmpty {
+                if notes.isEmpty {
                     Text("Add your notes here")
                         .font(font)
                         .padding(EdgeInsets(top: 7, leading: 4, bottom: 0, trailing: 0))
@@ -74,12 +73,12 @@ struct RecordInfo: View {
                 }
             }
         }
+        .animation(.easeOut, value: notes)
         .padding()
         .onAppear {
-            editableNotes = notes
             debouncedNotes = notes
         }
-        .debounced(value: $editableNotes, debouncedValue: $debouncedNotes)
+        .debounced(value: $notes, debouncedValue: $debouncedNotes)
         .onChange(of: debouncedNotes) { oldValue, newValue in
             if newValue != notes {
                 onChange(newValue)

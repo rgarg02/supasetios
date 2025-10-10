@@ -249,7 +249,12 @@ final class AppDatabase: Sendable {
     }
 }
 
-
+extension AppDatabase {
+    /// Provides a read-only access to the database.
+    var reader: any GRDB.DatabaseReader {
+        dbWriter
+    }
+}
 // Helper extension for ordering exercises by name, case-insensitively.
 extension QueryInterfaceRequest where RowDecoder == Exercise {
     func orderedByName() -> Self {

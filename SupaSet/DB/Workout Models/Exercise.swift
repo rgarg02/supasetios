@@ -233,6 +233,17 @@ extension ExerciseImage {
         request(for: ExerciseImage.exercise)
     }
 }
+
+struct ExerciseRowDetail: Codable, Identifiable, Equatable {
+    var id: String
+    var name: String
+    var force: Force?
+    var level: Level
+    var equipment: Equipment?
+    var primaryMuscles: [MuscleGroup]
+    var category: Category
+    var frequency: Int?
+}
 struct ExerciseJSON: Codable, Identifiable, Equatable, Hashable {
     var id: String
     var name: String

@@ -6,20 +6,22 @@
 //
 import SwiftUI
 struct NameEditor: View {
-    let name: String
+    @Binding var name: String
     var onChange: ((String) -> ())
-    @State private var editableName: String = ""
     @State private var debouncedName: String = ""
     var font: Font = .title
+    init(name: Binding<String>, onChange: @escaping (String) -> Void) {
+        self._name = name
+        self.onChange = onChange
+    }
     var body: some View {
-        TextField("New Workout", text: $editableName)
+        TextField("New Workout", text: $name)
             .multilineTextAlignment(.center)
             .font(font.bold())
             .textFieldStyle(.plain)
             .submitLabel(.done)
             .frame(maxWidth: .infinity, alignment: .center)
             .onAppear {
-                editableName = name
                 debouncedName = name
             }
             .onChange(of: debouncedName) { oldValue, newValue in
@@ -27,6 +29,7 @@ struct NameEditor: View {
                     onChange(newValue)
                 }
             }
-            .debounced(value: $editableName, debouncedValue: $debouncedName)
+            .animation(.easeOut, value: name)
+            .debounced(value: $name, debouncedValue: $debouncedName)
     }
 }

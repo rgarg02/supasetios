@@ -14,7 +14,7 @@ struct ExerciseNameView: View {
     @State private var name: String = ""
     @Environment(\.appDatabase) private var appDatabase
     var body: some View {
-        Text("\(name)")
+        Text("\(name == "" ? exerciseID : name)")
             .font(.title2.bold())
             .lineLimit(1)
             .task {

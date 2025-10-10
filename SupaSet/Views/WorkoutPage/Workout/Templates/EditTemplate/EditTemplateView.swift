@@ -10,6 +10,7 @@ struct EditTemplateView: View {
     @State private var showDistribution = false
     @State private var activePrimaryMuscles: Set<MuscleGroup> = []
     @State private var activeSecondaryMuscles: Set<MuscleGroup> = []
+    
     @Namespace var namespace
     init(appDatabase: AppDatabase, workoutTemplate: WorkoutTemplate? = nil, fullTemplateExercises: [FullTemplateExercise]? = nil){
         self._templateVM = State(initialValue: TemplateVM(template: workoutTemplate, appDatabase: appDatabase))
@@ -18,11 +19,10 @@ struct EditTemplateView: View {
     }
     var body: some View {
         ScrollView {
-            VStack {
-                NameEditor(name: templateVM.template.name) { newName in
+            VStack {                NameEditor(name: $templateVM.template.name) { newName in
                     templateVM.updateTemplateName(to: newName)
                 }
-                RecordInfo(creationDate: templateVM.template.creationDate ?? .now, modificationDate: templateVM.template.modificationDate ?? .now, showTimer: false, notes: templateVM.template.notes) { newNotes in
+                RecordInfo(creationDate: templateVM.template.creationDate ?? .now, modificationDate: templateVM.template.modificationDate ?? .now, showTimer: false, notes: $templateVM.template.notes) { newNotes in
                     templateVM.updateTemplateNotes(to: newNotes)
                 }
                 TemplateExercisesView(templateVM: templateVM)

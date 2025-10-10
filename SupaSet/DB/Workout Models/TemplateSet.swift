@@ -15,6 +15,7 @@
 
 import Foundation
 import GRDB
+import FoundationModels
 
 extension TemplateExerciseSet.RepType: DatabaseValueConvertible {}
 
